@@ -1,9 +1,10 @@
+import Login from "@/components/login";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
-export default async function Home() {
+export default async function Page() {
   const session = await getServerSession();
   if (session) redirect("/kanban");
 
-  redirect("/login");
+  return <Login />;
 }

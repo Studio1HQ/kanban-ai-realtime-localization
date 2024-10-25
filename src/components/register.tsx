@@ -6,9 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
 
-export default function Login() {
+export default function Register() {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -19,20 +18,19 @@ export default function Login() {
     const email = formData.get("email");
     const password = formData.get("password");
 
-    const response = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
+    const response = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
     });
 
-    if (response) {
-      console.log(response);
-      router.push("/");
+    if (response.ok) {
+      router.push("/login");
       router.refresh();
     } else {
       toast({
         title: "Uh oh! Something went wrong.",
-        description: "Invalid email or password",
+        description: "There was a problem registering your account.",
         variant: "destructive",
       });
     }
@@ -42,7 +40,7 @@ export default function Login() {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-900">
-          Login
+          Register
         </h2>
 
         <form onSubmit={handleSubmit}>
@@ -70,16 +68,16 @@ export default function Login() {
             type="submit"
             className="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600 transition duration-200"
           >
-            Login
+            Register
           </Button>
 
           <p className="text-center mt-4">
-            Don&apos;t have an account?{" "}
+            Already have an account?{" "}
             <Link
-              href="/register"
+              href="/login"
               className="text-blue-500 hover:text-blue-600 transition duration-200"
             >
-              Register
+              Login
             </Link>
           </p>
         </form>
