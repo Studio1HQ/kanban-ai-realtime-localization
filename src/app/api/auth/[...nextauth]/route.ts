@@ -8,9 +8,14 @@ const handler = NextAuth({
   session: {
     strategy: "jwt",
   },
+  pages: {
+    signIn: "/login",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     CredentialsProvider({
       name: "Credentials",
+      // These are used in the default sign-in page from next-auth.
       credentials: {
         email: {
           label: "Email",
@@ -49,7 +54,6 @@ const handler = NextAuth({
           userInputPassword,
           potentialUser.password,
         );
-        console.log("isCorrectPassword", isCorrectPassword);
 
         if (!isCorrectPassword) return null;
 
