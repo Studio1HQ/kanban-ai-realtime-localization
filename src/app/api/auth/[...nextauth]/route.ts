@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcrypt";
-import { AuthValidator, TAuthValidator } from "@/lib/validators/auth";
+import { AuthSchema, TAuthSchema } from "@/lib/validators/auth";
 import { db } from "@/db";
 
 const handler = NextAuth({
@@ -25,7 +25,7 @@ const handler = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const payload: TAuthValidator | null =
+        const payload: TAuthSchema | null =
           credentials?.email && credentials?.password
             ? {
                 email: credentials.email,
@@ -35,7 +35,7 @@ const handler = NextAuth({
 
         if (!payload) return null;
 
-        const validatedFields = AuthValidator.safeParse(payload);
+        const validatedFields = AuthSchema.safeParse(payload);
 
         if (!validatedFields.success) return null;
 

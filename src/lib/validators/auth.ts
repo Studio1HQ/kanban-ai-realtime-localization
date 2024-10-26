@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const AuthValidator = z.object({
+export const AuthSchema = z.object({
   email: z.string().email(),
   password: z
     .string()
@@ -13,4 +13,4 @@ export const AuthValidator = z.object({
     }),
 });
 
-export type TAuthValidator = z.infer<typeof AuthValidator>;
+export type TAuthSchema = z.infer<typeof AuthSchema>;
