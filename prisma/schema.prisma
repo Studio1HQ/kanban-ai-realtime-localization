@@ -24,8 +24,8 @@ model User {
   email    String @unique
   password String
 
-  boards Board[] @relation("UserBoards")
-  tasks  Task[]  @relation("UserTasks")
+  board Board? @relation("UserBoard")
+  tasks Task[] @relation("UserTasks")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -34,20 +34,20 @@ model User {
 model Board {
   id     String @id @default(cuid())
   title  String
-  userId String
+  userId String @unique
 
   tasks   Task[]
   columns Column[] @relation("BoardColumns")
 
-  user User @relation("UserBoards", fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation("UserBoard", fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Column {
-  id      String @id @default(cuid())
-  name    String
+  id      String     @id @default(cuid())
+  name    TaskStatus
   boardId String
   order   Int
 
