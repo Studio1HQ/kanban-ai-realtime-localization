@@ -12,26 +12,18 @@ export async function GET(req: NextRequest) {
 
     const url = new URL(req.url);
     const passedEmail = url.searchParams.get("email") || "";
+    const userId = url.searchParams.get("userId");
 
-    if (session.user?.email !== passedEmail) {
+    if (!userId || session.user?.email !== passedEmail) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const userWithBoardsAndTasks = await db.user.findUnique({
-      where: { email: passedEmail },
+      where: { email: passedEmail, id: userId },
       select: {
-        password: false,
         id: true,
-        email: true,
-        board: {
-          include: {
-            columns: {
-              include: {
-                tasks: true,
-              },
-            },
-          },
-        },
+        password: false,
+        tasks: true,
       },
     });
 

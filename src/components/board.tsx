@@ -6,11 +6,12 @@ import { DragDropContext } from "react-beautiful-dnd";
 import { getSession } from "next-auth/react";
 import axios from "axios";
 import { Session } from "next-auth";
+import { Task } from "@prisma/client";
 
-export const Board = () => {
+export const Board = ({ userId }: { userId: string }) => {
   const socket = useSocket();
 
-  const [tasks, setTasks] = useState({});
+  const [tasks, setTasks] = useState<Task[] | null>([]);
   const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
@@ -28,10 +29,10 @@ export const Board = () => {
     const getUserData = async () => {
       try {
         const { data } = await axios.get("/api/tasks", {
-          params: { email: userEmail },
+          params: { userId, email: userEmail },
         });
-        setTasks(data);
-        console.log("this is the data", tasks);
+        setTasks(data.tasks);
+        console.log("this is the data", data);
       } catch (e) {
         console.error(e);
       }
@@ -47,7 +48,8 @@ export const Board = () => {
   return (
     <div className="container">
       <DragDropContext onDragEnd={handleDragEnd}>
-        <div>This is good </div>
+        {Array.isArray(tasks) &&
+          tasks.map((task) => <div key={task.id}>{task.title}</div>)}
       </DragDropContext>
     </div>
   );

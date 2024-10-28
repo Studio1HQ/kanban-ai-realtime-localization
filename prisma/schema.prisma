@@ -13,46 +13,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum TaskStatus {
-  Pending
-  Ongoing
-  Completed
-}
-
 model User {
   id       String @id @default(cuid())
   email    String @unique
   password String
 
-  board Board? @relation("UserBoard")
   tasks Task[] @relation("UserTasks")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Board {
-  id     String @id @default(cuid())
-  title  String
-  userId String @unique
-
-  tasks   Task[]
-  columns Column[] @relation("BoardColumns")
-
-  user User @relation("UserBoard", fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Column {
-  id      String     @id @default(cuid())
-  name    TaskStatus
-  boardId String
-  order   Int
-
-  board Board  @relation("BoardColumns", fields: [boardId], references: [id])
-  tasks Task[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -62,15 +28,11 @@ model Task {
   id          String  @id @default(cuid())
   title       String
   description String?
-  columnId    String
-  boardId     String
-  createdById String
+  userId      String
 
-  status TaskStatus
-  column Column     @relation(fields: [columnId], references: [id])
-  board  Board      @relation(fields: [boardId], references: [id])
+  order Int
 
-  createdBy User @relation("UserTasks", fields: [createdById], references: [id])
+  createdBy User @relation("UserTasks", fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

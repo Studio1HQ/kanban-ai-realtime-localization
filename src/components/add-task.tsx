@@ -7,14 +7,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { GearIcon } from "@radix-ui/react-icons";
 
 import { useChat } from "ai/react";
+import axios from "axios";
 
-export const AddTask = () => {
+export const AddTask = ({ userId }: { userId: string }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
   const {
     messages,
-    input: AIInput,
+    //input: AIInput,
     handleSubmit: handleAISubmit,
     setInput: setAIInput,
   } = useChat();
@@ -33,15 +34,23 @@ export const AddTask = () => {
     handleAISubmit();
   };
 
-  useEffect(() => {
-    console.log("Updated AI input:", AIInput);
-  }, [AIInput]);
+  //useEffect(() => {
+  //  console.log("Updated AI input:", AIInput);
+  //}, [AIInput]);
 
-  const handleFormSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    console.log("Task Submitted:", { title, description, AIInput });
-    setTitle("");
-    setDescription("");
+  const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      const { data } = await axios.post(`/api/tasks/${userId}/create`, {
+        title,
+        description,
+      });
+      console.log("Task Submitted:", data);
+      setTitle("");
+      setDescription("");
+    } catch (error) {
+      console.error("Error submitting task:", error);
+    }
   };
 
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
