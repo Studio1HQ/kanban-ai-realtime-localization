@@ -4,7 +4,7 @@ import { signOut } from "next-auth/react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
-export function LogoutBtn() {
+export const LogoutBtn = () => {
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -24,4 +24,4 @@ export function LogoutBtn() {
       Logout
     </Button>
   );
-}
+};

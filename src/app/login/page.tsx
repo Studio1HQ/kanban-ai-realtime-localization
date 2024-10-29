@@ -1,4 +1,4 @@
-import Login from "@/components/login";
+import { Login } from "@/components/login";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 

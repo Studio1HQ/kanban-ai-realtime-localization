@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 
-export default function Login() {
+export const Login = () => {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -86,4 +86,4 @@ export default function Login() {
       </div>
     </div>
   );
-}
+};

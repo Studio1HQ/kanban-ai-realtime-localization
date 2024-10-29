@@ -4,7 +4,7 @@ import Link from "next/link";
 import { LogoutBtn } from "@/components/logout-btn";
 import { buttonVariants } from "@/components/ui/button";
 
-export async function Navbar() {
+export const Navbar = async () => {
   const session = await getServerSession();
 
   return (
@@ -46,4 +46,4 @@ export async function Navbar() {
       </div>
     </nav>
   );
-}
+};

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 
-export default function Register() {
+export const Register = () => {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -84,4 +84,4 @@ export default function Register() {
       </div>
     </div>
   );
-}
+};
