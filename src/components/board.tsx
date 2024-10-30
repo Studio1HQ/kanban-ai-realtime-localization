@@ -2,7 +2,12 @@
 
 import { useSocket } from "@/providers/socket-provider";
 import { useEffect, useState } from "react";
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from "react-beautiful-dnd";
 import { getSession } from "next-auth/react";
 import axios from "axios";
 import { Session } from "next-auth";
@@ -29,9 +34,10 @@ export const Board = ({ userId }: { userId: string }) => {
 
     const getUserData = async () => {
       try {
-        const { data } = await axios.get("/api/tasks", {
+        const { data } = (await axios.get("/api/tasks", {
           params: { userId, email: userEmail },
-        });
+        })) as { data: { tasks: TTask[] } };
+
         setTasks(data.tasks);
         console.log("this is the data", data);
       } catch (e) {
@@ -42,6 +48,15 @@ export const Board = ({ userId }: { userId: string }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
+  useEffect(() => {
+    console.log("socket changed");
+    socket?.on("tasks-updated", (data: TTask[] | undefined) => {
+      console.log("socket data", data);
+      if (!data) return;
+      setTasks(data);
+    });
+  }, [socket]);
+
   const columns = {
     0: "Ongoing",
     1: "Pending",
@@ -49,14 +64,45 @@ export const Board = ({ userId }: { userId: string }) => {
   };
 
   const tasksByStatus = (status: number) =>
-    tasks?.filter((task) => task.order === status) || [];
+    (tasks?.filter((task) => task.column === status) || []).sort(
+      (a, b) => a.order - b.order
+    );
 
-  const handleDragEnd = () => {
-    console.log("dragged");
+  const handleDragEnd = ({ destination, source }: DropResult) => {
+    if (!destination) return;
+    if (
+      destination.index === source.index &&
+      destination.droppableId === source.droppableId
+    )
+      return;
+
+    const newTasks = tasks ? [...tasks] : [];
+    const [movedTask] = newTasks.splice(source.index, 1);
+
+    newTasks.splice(destination.index, 0, movedTask);
+
+    movedTask.column = Number(destination.droppableId);
+    movedTask.order = Number(destination.index);
+
+    // Insert the moved task at the new index
+    newTasks.splice(destination.index, 0, movedTask);
+
+    setTasks(newTasks);
+
+    console.log("this is the moved task", movedTask);
+
+    socket?.emit("task-drag", {
+      id: movedTask.id,
+      newColumn: movedTask.column,
+      newOrder: movedTask.order,
+      email: session?.user?.email || "",
+    });
+
+    console.log(destination, source);
   };
 
   return (
-    <div className="container mx-auto mt-10">
+    <div className="container mx-auto mt-10 mb-5">
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {Object.entries(columns).map(([status, title]) => (

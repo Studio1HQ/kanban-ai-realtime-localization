@@ -69,6 +69,7 @@ export const AddTask = ({ userId }: { userId: string }) => {
             className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
           />
           <Button
+            type="button"
             onClick={handleGenerateClick}
             className="flex items-center gap-2 font-semibold h-10 px-4 text-white rounded w-full sm:w-auto"
             disabled={title.split(" ").length < 3}

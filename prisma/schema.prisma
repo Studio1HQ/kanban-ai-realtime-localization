@@ -30,7 +30,8 @@ model Task {
   description String?
   userId      String
 
-  order Int
+  column Int
+  order  Int
 
   createdBy User @relation("UserTasks", fields: [userId], references: [id])
 

@@ -26,12 +26,22 @@ export async function POST(
 
     const { title, description } = validatedFields.data;
 
+    const columnTasks = await db.task.findMany({
+      where: {
+        userId: params.userId,
+        column: 0,
+      },
+    });
+
+    const newOrder = columnTasks.length;
+
     const newTask = await db.task.create({
       data: {
         title,
         ...(description ? { description } : {}),
         userId: params.userId,
-        order: 0,
+        column: 0,
+        order: newOrder,
       },
     });
 
