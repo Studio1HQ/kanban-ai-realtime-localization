@@ -64,9 +64,7 @@ export const Board = ({ userId }: { userId: string }) => {
   };
 
   const tasksByStatus = (status: number) =>
-    (tasks?.filter((task) => task.column === status) || []).sort(
-      (a, b) => a.order - b.order
-    );
+    tasks?.filter((task) => task.column === status) || [];
 
   const handleDragEnd = ({ destination, source }: DropResult) => {
     if (!destination) return;
@@ -78,8 +76,6 @@ export const Board = ({ userId }: { userId: string }) => {
 
     const newTasks = tasks ? [...tasks] : [];
     const [movedTask] = newTasks.splice(source.index, 1);
-
-    newTasks.splice(destination.index, 0, movedTask);
 
     movedTask.column = Number(destination.droppableId);
     movedTask.order = Number(destination.index);
@@ -101,22 +97,25 @@ export const Board = ({ userId }: { userId: string }) => {
     console.log(destination, source);
   };
 
+  if (!tasks || tasks.length === 0) return null;
+
   return (
     <div className="container mx-auto mt-10 mb-5">
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {Object.entries(columns).map(([status, title]) => (
-            <Droppable droppableId={status} key={status}>
-              {(provided) => (
-                <div
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  className="p-4 border rounded-lg shadow-lg bg-gray-50 flex flex-col items-center"
-                >
-                  <h2 className="text-xl font-bold mb-4 text-center">
-                    {title}
-                  </h2>
-                  <div className="w-full flex flex-col items-center">
+            <div
+              key={status}
+              className="p-4 border rounded-lg shadow-lg bg-gray-50 flex flex-col items-center"
+            >
+              <h2 className="text-xl font-bold mb-4 text-center">{title}</h2>
+              <Droppable droppableId={status}>
+                {(provided) => (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="w-full flex flex-col items-center"
+                  >
                     {tasksByStatus(Number(status)).map((task, index) => (
                       <Draggable
                         key={task.id}
@@ -137,9 +136,9 @@ export const Board = ({ userId }: { userId: string }) => {
                     ))}
                     {provided.placeholder}
                   </div>
-                </div>
-              )}
-            </Droppable>
+                )}
+              </Droppable>
+            </div>
           ))}
         </div>
       </DragDropContext>

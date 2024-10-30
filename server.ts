@@ -1,10 +1,9 @@
-// NOTE: Always Keep this import at the top.
+// NOTE: Always Keep this 'tsconfig-paths' import at the top.
 import "tsconfig-paths/register";
 
 import { createServer } from "node:http";
 import next from "next";
 import { Server } from "socket.io";
-import { DraggableLocation } from "react-beautiful-dnd";
 import { db } from "@/db";
 import { Task as TTask } from "@prisma/client";
 
@@ -101,12 +100,12 @@ async function updateTaskInDB(
     },
   });
 
-  const updatedTasks = await db.task.findMany({
+  const sortedTasks = await db.task.findMany({
     where: {
       userId: taskToMove.userId,
     },
     orderBy: [{ column: "asc" }, { order: "asc" }],
   });
 
-  return updatedTasks;
+  return sortedTasks;
 }
