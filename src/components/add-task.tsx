@@ -11,10 +11,14 @@ import { useTranslate, T } from "@tolgee/react";
 import { useChat } from "ai/react";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
+import { useSocket } from "@/providers/socket-provider";
+import { Task as TTask } from "@prisma/client";
 
 export const AddTask = ({ userId }: { userId: string }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+
+  const socket = useSocket();
 
   const { t } = useTranslate();
 
@@ -41,16 +45,20 @@ export const AddTask = ({ userId }: { userId: string }) => {
     handleAISubmit();
   };
 
-  const { mutate: createTask } = useMutation({
+  const { mutate: createTask, isPending } = useMutation({
     mutationFn: async () => {
-      await axios.post(`/api/tasks/${userId}/create`, {
+      const { data } = await axios.post(`/api/tasks/${userId}/create`, {
         title,
         description,
       });
+      console.log("this is the data we received", data);
+      return data as TTask;
     },
-    onSuccess: () => {
+    onSuccess: (newTask) => {
       setTitle("");
       setDescription("");
+
+      socket?.emit("task-created", newTask);
     },
     onError: (error) => {
       console.error("Error submitting task:", error);
@@ -90,7 +98,7 @@ export const AddTask = ({ userId }: { userId: string }) => {
             type="button"
             onClick={handleGenerateClick}
             className="flex items-center gap-2 font-semibold h-10 px-4 text-white rounded w-full sm:w-auto"
-            disabled={title.split(" ").length < 3}
+            disabled={title.split(" ").length < 3 || isPending}
           >
             <GearIcon className="w-5 h-5" />
             <T keyName="generate" />
@@ -107,7 +115,7 @@ export const AddTask = ({ userId }: { userId: string }) => {
           <Button
             type="submit"
             className="font-semibold h-10 px-4 text-white rounded w-full sm:w-auto"
-            disabled={title.split(" ").length < 3}
+            disabled={title.split(" ").length < 3 || isPending}
           >
             <T keyName="submit" />
           </Button>

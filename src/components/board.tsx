@@ -14,6 +14,7 @@ import { Session } from "next-auth";
 import { Task as TTask } from "@prisma/client";
 import { Task } from "@/components/task";
 import { T } from "@tolgee/react";
+import { useQuery } from "@tanstack/react-query";
 
 export const Board = ({ userId }: { userId: string }) => {
   const socket = useSocket();
@@ -30,42 +31,55 @@ export const Board = ({ userId }: { userId: string }) => {
   }, []);
 
   useEffect(() => {
-    if (!session) return;
-    const userEmail = session.user?.email || "";
-
-    const getUserData = async () => {
-      try {
-        const { data } = (await axios.get("/api/tasks", {
-          params: { userId, email: userEmail },
-        })) as { data: { tasks: TTask[] } };
-
-        setTasks(data.tasks);
-        console.log("this is the data", data);
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    getUserData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session]);
-
-  useEffect(() => {
     console.log("socket changed");
     socket?.on("tasks-updated", (data: TTask[] | undefined) => {
       console.log("socket data", data);
       if (!data) return;
       setTasks(data);
     });
+
+    return () => {
+      socket?.off("tasks-updated");
+    };
   }, [socket]);
+
+  useEffect(() => {
+    console.log("socket changed in the task-created");
+    socket?.on("task-created", (newTask: TTask) => {
+      console.log("socket data", newTask);
+      setTasks((prevTasks) => [...(prevTasks || []), newTask]);
+    });
+
+    return () => {
+      socket?.off("task-created");
+    };
+  }, [socket]);
+
+  const fetchUserData = async (userId: string, userEmail: string) => {
+    const { data } = (await axios.get("/api/tasks", {
+      params: { userId, email: userEmail },
+    })) as { data: { tasks: TTask[] } };
+    return data.tasks;
+  };
+
+  useQuery({
+    queryKey: ["userTasks"],
+    queryFn: async () => {
+      const userTasks = await fetchUserData(userId, session?.user?.email || "");
+      setTasks(userTasks);
+      return userTasks;
+    },
+    enabled: !!session,
+  });
+
+  const tasksByStatus = (status: number) =>
+    tasks?.filter((task) => task.column === status) || [];
 
   const columns = {
     0: "Ongoing",
     1: "Pending",
     2: "Completed",
   };
-
-  const tasksByStatus = (status: number) =>
-    tasks?.filter((task) => task.column === status) || [];
 
   const handleDragEnd = ({ destination, source }: DropResult) => {
     if (!destination) return;

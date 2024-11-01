@@ -22,8 +22,8 @@ app.prepare().then(() => {
   io.on("connection", (socket) => {
     console.log(`'${socket.id}' user just connected! ✨`);
 
-    socket.on("message", (payload) => {
-      console.log("This is the message we received:", payload);
+    socket.on("task-created", async (payload: TTask) => {
+      io.sockets.emit("task-created", payload);
     });
 
     socket.on(
