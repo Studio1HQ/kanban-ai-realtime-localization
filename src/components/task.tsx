@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import { T } from "@tolgee/react";
 
 import { format } from "date-fns";
 
@@ -24,12 +25,16 @@ export const Task = ({ task }: { task: TTask }) => {
             href={`/kanban/${task.id}`}
             className="text-gray-800 text-semibold underline hover:text-gray-900 underline-offset-2"
           >
-            View description
+            <T keyName="view-description" />
           </Link>
         </CardContent>
       ) : null}
       <CardFooter className="text-sm text-gray-500">
-        <span className="font-semibold mr-2">Created on:</span> {createdDate}
+        <span className="font-semibold mr-2">
+          <T keyName="created-on" />
+          {": "}
+        </span>
+        {createdDate}
       </CardFooter>
     </Card>
   );

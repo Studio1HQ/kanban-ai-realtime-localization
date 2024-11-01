@@ -3,7 +3,10 @@ import localFont from "next/font/local";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
-import SocketProviderClient from "@/providers/socket-provider";
+import Providers from "@/providers/providers";
+import { getLanguage } from "@/tolgee/language";
+import { getStaticData } from "@/tolgee/shared";
+import { TolgeeNextProvider } from "@/tolgee/client";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -25,20 +28,25 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
+  const locale = await getLanguage();
+
+  const staticData = await getStaticData([locale, "en"]);
   return (
-    <html lang="en">
-      <SocketProviderClient>
+    <html lang={locale}>
+      <Providers>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <Navbar />
-          {children}
-          <Toaster />
+          <TolgeeNextProvider language={locale} staticData={staticData}>
+            <Navbar />
+            {children}
+            <Toaster />
+          </TolgeeNextProvider>
         </body>
-      </SocketProviderClient>
+      </Providers>
     </html>
   );
 }

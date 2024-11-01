@@ -7,10 +7,13 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
+import { T, useTranslate } from "@tolgee/react";
 
 export const Login = () => {
   const router = useRouter();
   const { toast } = useToast();
+
+  const { t } = useTranslate();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,7 +45,7 @@ export const Login = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-900">
-          Login
+          <T keyName="login" />
         </h2>
 
         <form onSubmit={handleSubmit}>
@@ -50,7 +53,7 @@ export const Login = () => {
             <Input
               type="email"
               name="email"
-              placeholder="Email"
+              placeholder={t("email")}
               required
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -60,7 +63,7 @@ export const Login = () => {
             <Input
               type="password"
               name="password"
-              placeholder="Password"
+              placeholder={t("password")}
               required
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -70,16 +73,16 @@ export const Login = () => {
             type="submit"
             className="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600 transition duration-200"
           >
-            Login
+            <T keyName="login" />
           </Button>
 
           <p className="text-center mt-4">
-            Don&apos;t have an account?{" "}
+            <T keyName="dont-have-an-account" />{" "}
             <Link
               href="/register"
               className="text-blue-500 hover:text-blue-600 transition duration-200"
             >
-              Register
+              <T keyName="register" />
             </Link>
           </p>
         </form>

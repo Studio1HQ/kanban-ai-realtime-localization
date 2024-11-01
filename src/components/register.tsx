@@ -6,10 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
+import { T, useTranslate } from "@tolgee/react";
 
 export const Register = () => {
   const router = useRouter();
   const { toast } = useToast();
+
+  const { t } = useTranslate();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -29,8 +32,8 @@ export const Register = () => {
       router.refresh();
     } else {
       toast({
-        title: "Uh oh! Something went wrong.",
-        description: "There was a problem registering your account.",
+        title: t("something-went-wrong"),
+        description: t("there-was-a-problem-registering-your-account"),
         variant: "destructive",
       });
     }
@@ -40,7 +43,7 @@ export const Register = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-900">
-          Register
+          <T keyName="register" />
         </h2>
 
         <form onSubmit={handleSubmit}>
@@ -48,7 +51,7 @@ export const Register = () => {
             <Input
               type="email"
               name="email"
-              placeholder="Email"
+              placeholder={t("email")}
               required
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -58,7 +61,7 @@ export const Register = () => {
             <Input
               type="password"
               name="password"
-              placeholder="Password"
+              placeholder={t("password")}
               required
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -68,16 +71,16 @@ export const Register = () => {
             type="submit"
             className="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600 transition duration-200"
           >
-            Register
+            <T keyName="register" />
           </Button>
 
           <p className="text-center mt-4">
-            Already have an account?{" "}
+            <T keyName="already-have-an-account" />{" "}
             <Link
               href="/login"
               className="text-blue-500 hover:text-blue-600 transition duration-200"
             >
-              Login
+              <T keyName="login" />
             </Link>
           </p>
         </form>

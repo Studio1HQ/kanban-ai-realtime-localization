@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { LogoutBtn } from "@/components/logout-btn";
 import { buttonVariants } from "@/components/ui/button";
+import { LangSelector } from "./lang-selector";
+import { T } from "@/tolgee/server";
 
 export const Navbar = async () => {
   const session = await getServerSession();
@@ -14,9 +16,10 @@ export const Navbar = async () => {
         className="text-xl font-semibold hidden  text-gray-800 sm:flex items-center select-none"
       >
         <ListTodo size={30} className="mr-2 inline" />
-        Kanban
+        <T keyName="kanban" />
       </Link>
       <div className="flex gap-4 ml-auto">
+        <LangSelector />
         {session ? (
           <LogoutBtn />
         ) : (
@@ -29,7 +32,7 @@ export const Navbar = async () => {
                 variant: "outline",
               })}
             >
-              Login
+              <T keyName="login" />
             </Link>
             <Link
               href="/register"
@@ -39,7 +42,7 @@ export const Navbar = async () => {
                 variant: "outline",
               })}
             >
-              Register
+              <T keyName="register" />
             </Link>
           </>
         )}

@@ -13,6 +13,7 @@ import axios from "axios";
 import { Session } from "next-auth";
 import { Task as TTask } from "@prisma/client";
 import { Task } from "@/components/task";
+import { T } from "@tolgee/react";
 
 export const Board = ({ userId }: { userId: string }) => {
   const socket = useSocket();
@@ -108,13 +109,15 @@ export const Board = ({ userId }: { userId: string }) => {
               key={status}
               className="p-4 border rounded-lg shadow-lg bg-gray-50 flex flex-col items-center"
             >
-              <h2 className="text-xl font-bold mb-4 text-center">{title}</h2>
+              <h2 className="text-xl font-bold mb-4 text-center">
+                <T keyName={title.toLowerCase()} />
+              </h2>
               <Droppable droppableId={status}>
                 {(provided) => (
                   <div
                     {...provided.droppableProps}
                     ref={provided.innerRef}
-                    className="w-full flex flex-col items-center"
+                    className="w-full flex flex-col items-center min-h-40"
                   >
                     {tasksByStatus(Number(status)).map((task, index) => (
                       <Draggable

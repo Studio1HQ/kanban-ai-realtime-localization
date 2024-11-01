@@ -5,13 +5,20 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { GearIcon } from "@radix-ui/react-icons";
+import { useMutation } from "@tanstack/react-query";
+import { useTranslate, T } from "@tolgee/react";
 
 import { useChat } from "ai/react";
 import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 
 export const AddTask = ({ userId }: { userId: string }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+
+  const { t } = useTranslate();
+
+  const { toast } = useToast();
 
   const {
     messages,
@@ -34,23 +41,34 @@ export const AddTask = ({ userId }: { userId: string }) => {
     handleAISubmit();
   };
 
+  const { mutate: createTask } = useMutation({
+    mutationFn: async () => {
+      await axios.post(`/api/tasks/${userId}/create`, {
+        title,
+        description,
+      });
+    },
+    onSuccess: () => {
+      setTitle("");
+      setDescription("");
+    },
+    onError: (error) => {
+      console.error("Error submitting task:", error);
+      toast({
+        title: t("something-went-wrong"),
+        description: t("failed-to-create-task"),
+        variant: "destructive",
+      });
+    },
+  });
+
   //useEffect(() => {
   //  console.log("Updated AI input:", AIInput);
   //}, [AIInput]);
 
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    try {
-      const { data } = await axios.post(`/api/tasks/${userId}/create`, {
-        title,
-        description,
-      });
-      console.log("Task Submitted:", data);
-      setTitle("");
-      setDescription("");
-    } catch (error) {
-      console.error("Error submitting task:", error);
-    }
+    createTask();
   };
 
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -63,7 +81,7 @@ export const AddTask = ({ userId }: { userId: string }) => {
         <form onSubmit={handleFormSubmit} className="space-y-4">
           <Input
             type="text"
-            placeholder="Task Title"
+            placeholder={t("task-title")}
             value={title}
             onChange={handleTitleChange}
             className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
@@ -75,13 +93,14 @@ export const AddTask = ({ userId }: { userId: string }) => {
             disabled={title.split(" ").length < 3}
           >
             <GearIcon className="w-5 h-5" />
-            Generate
+            <T keyName="generate" />
           </Button>
 
           <Textarea
-            placeholder="Task Description"
+            placeholder={t("task-description")}
             value={description}
-            readOnly // Prevent user input in Textarea
+            // Prevent user input in Textarea
+            readOnly
             className="mt-4 w-full h-28 px-4 py-2 border border-gray-300 rounded resize-none focus:outline-none focus:border-blue-500"
           />
 
@@ -90,7 +109,7 @@ export const AddTask = ({ userId }: { userId: string }) => {
             className="font-semibold h-10 px-4 text-white rounded w-full sm:w-auto"
             disabled={title.split(" ").length < 3}
           >
-            Submit
+            <T keyName="submit" />
           </Button>
         </form>
       </div>

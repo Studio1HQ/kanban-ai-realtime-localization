@@ -3,6 +3,7 @@
 import { signOut } from "next-auth/react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { T } from "@tolgee/react";
 
 export const LogoutBtn = () => {
   const router = useRouter();
@@ -21,7 +22,7 @@ export const LogoutBtn = () => {
         variant: "secondary",
       })}
     >
-      Logout
+      <T keyName="logout" />
     </Button>
   );
 };
