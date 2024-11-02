@@ -47,7 +47,7 @@ export async function POST(
 
     return NextResponse.json(newTask);
   } catch (error) {
-    console.error(error);
+    console.error("ERROR:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },

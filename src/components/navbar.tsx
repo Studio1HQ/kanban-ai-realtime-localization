@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { LogoutBtn } from "@/components/logout-btn";
 import { buttonVariants } from "@/components/ui/button";
-import { LangSelector } from "./lang-selector";
+import { LangSelector } from "@/components/lang-selector";
 import { T } from "@/tolgee/server";
 
 export const Navbar = async () => {

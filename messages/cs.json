@@ -17,6 +17,7 @@
   "completed": "Dokončeno",
   "pending": "Čeká na vyřízení",
   "created-on": "Vytvořeno",
+  "min-length-8": "Min. 8 znaků",
   "view-description": "Zobrazit popis",
   "something-went-wrong": "Uh oh, něco se pokazilo",
   "failed-to-create-task": "Nepodařilo se vytvořit úkol",

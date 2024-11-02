@@ -25,6 +25,13 @@ export const LangSelector = () => {
     setLanguage(value);
   }
 
+  const languageOptions = [
+    { code: "en", label: "English" },
+    { code: "cs", label: "Česky" },
+    { code: "fr", label: "Français" },
+    { code: "de", label: "Deutsch" },
+  ];
+
   return (
     <Select value={locale} onValueChange={onSelectChange}>
       <SelectTrigger className="w-[200px] border rounded-md">
@@ -37,10 +44,11 @@ export const LangSelector = () => {
           <SelectLabel className="mb-1">
             <T keyName="language" />
           </SelectLabel>
-          <SelectItem value="en">English</SelectItem>
-          <SelectItem value="cs">Česky</SelectItem>
-          <SelectItem value="fr">Français</SelectItem>
-          <SelectItem value="de">Deutsch</SelectItem>
+          {languageOptions.map(({ code, label }) => (
+            <SelectItem key={code} value={code}>
+              {label}
+            </SelectItem>
+          ))}
         </SelectGroup>
       </SelectContent>
     </Select>

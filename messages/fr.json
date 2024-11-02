@@ -17,6 +17,7 @@
   "completed": "Terminé",
   "pending": "En attente",
   "created-on": "Créé le",
+  "min-length-8": "Min. 8 caractères",
   "view-description": "Voir la description",
   "something-went-wrong": "Oh là là, quelque chose s'est mal passé",
   "failed-to-create-task": "Échec de la création de la tâche",

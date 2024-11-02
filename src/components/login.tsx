@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { T, useTranslate } from "@tolgee/react";
+import { LoaderCircle } from "lucide-react";
+import { Label } from "@/components/ui/label";
 
 export const Login = () => {
   const router = useRouter();
@@ -15,29 +17,38 @@ export const Login = () => {
 
   const { t } = useTranslate();
 
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setIsLoading(true);
 
-    const formData = new FormData(event.currentTarget);
-    const email = formData.get("email");
-    const password = formData.get("password");
+    try {
+      const response = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
 
-    const response = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
-
-    if (response) {
-      console.log(response);
-      router.push("/");
-      router.refresh();
-    } else {
+      if (response?.error) {
+        toast({
+          title: t("something-went-wrong"),
+          variant: "destructive",
+        });
+      } else {
+        router.push("/");
+        router.refresh();
+      }
+    } catch (error) {
+      console.error("ERROR:", error);
       toast({
-        title: "Uh oh! Something went wrong.",
-        description: "Invalid email or password",
+        title: t("something-went-wrong"),
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -50,29 +61,49 @@ export const Login = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
+            <Label
+              htmlFor="email"
+              className="text-xs font-bold uppercase text-gray-500"
+            >
+              <T keyName="email" />
+            </Label>
             <Input
               type="email"
               name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder={t("email")}
               required
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded"
             />
           </div>
 
           <div className="mb-6">
+            <Label
+              htmlFor="password"
+              className="text-xs font-bold uppercase text-gray-500"
+            >
+              <T keyName="password" />
+            </Label>
             <Input
               type="password"
               name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder={t("password")}
               required
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded"
             />
           </div>
 
           <Button
             type="submit"
-            className="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600 transition duration-200"
+            className="w-full bg-gray-600 text-white p-3 rounded hover:bg-gray-700 transition duration-200"
+            disabled={isLoading}
           >
+            {isLoading && (
+              <LoaderCircle className="w-5 h-5 text-gray-300 mr-2 animate-spin" />
+            )}
             <T keyName="login" />
           </Button>
 

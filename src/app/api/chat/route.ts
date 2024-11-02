@@ -22,14 +22,24 @@ export async function POST(req: NextRequest) {
     }
 
     const { messages } = validatedFields.data;
-    console.log("this is the messages", messages);
+
+    const lastUserMessage = [...messages]
+      .reverse()
+      .find((message) => message.role === "user")?.content;
+
+    if (!lastUserMessage) {
+      return NextResponse.json(
+        { error: "No user message found" },
+        { status: 400 },
+      );
+    }
 
     const response = await streamText({
       model: openai("gpt-3.5-turbo"),
       messages: convertToCoreMessages([
         {
           role: "user",
-          content: `Generate a short description for a kanban board task with the title: ${messages[messages.length - 1].content}.
+          content: `Generate a short description for a kanban board task with the title: ${lastUserMessage}.
           Make sure to give the response in plain text and not include any markdown characters.`,
         },
       ]),
@@ -37,7 +47,7 @@ export async function POST(req: NextRequest) {
 
     return response.toDataStreamResponse();
   } catch (error) {
-    console.log(error);
+    console.error("ERROR:", error);
     return NextResponse.json(
       { error: "Something went wrong" },
       { status: 500 },

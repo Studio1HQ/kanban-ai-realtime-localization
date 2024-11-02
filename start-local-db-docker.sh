@@ -4,18 +4,18 @@
 DB_CONTAINER_NAME="kanban-board"
 
 if ! [ -x "$(command -v docker)" ]; then
-  echo -e "Docker is not installed. Please install docker and try again.\nDocker install guide: https://docs.docker.com/engine/install/"
+  echo -e "Docker is not installed. Please install docker and try again."
   exit 1
 fi
 
 if [ "$(docker ps -q -f name=$DB_CONTAINER_NAME)" ]; then
-  echo "Database container '$DB_CONTAINER_NAME' already running"
+  echo "Database container '$DB_CONTAINER_NAME' is already running"
   exit 0
 fi
 
 if [ "$(docker ps -q -a -f name=$DB_CONTAINER_NAME)" ]; then
   docker start "$DB_CONTAINER_NAME"
-  echo "Existing database container '$DB_CONTAINER_NAME' started"
+  echo "Existing database container '$DB_CONTAINER_NAME' has been started"
   exit 0
 fi
 
@@ -47,12 +47,12 @@ if [ "$DB_PASSWORD" = "password" ]; then
     DB_PASSWORD=$(openssl rand -base64 12 | tr '+/' '-_')
     sed -i -e "s#:password@#:$DB_PASSWORD@#" .env
   else
-    echo "Please set a password in the .env file and try again"
+    echo "Please set a password in the `.env` file and try again"
     exit 1
   fi
 fi
 
-echo "Starting on port $DB_PORT"
+echo "Starting the container on port $DB_PORT"
 
 docker run -d \
   --name $DB_CONTAINER_NAME \

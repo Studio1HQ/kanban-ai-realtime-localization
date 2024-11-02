@@ -21,7 +21,7 @@ export const useSocket = () => {
 export default function SocketProviderClient({
   children,
 }: {
-  children: ReactNode; // Change this to ReactNode
+  children: ReactNode;
 }) {
   const socket = useMemo(() => {
     const socketInstance = getSocket();

@@ -6,10 +6,11 @@ import next from "next";
 import { Server } from "socket.io";
 import { db } from "@/db";
 import { Task as TTask } from "@prisma/client";
+import { DraggableLocation } from "react-beautiful-dnd";
 
 const dev = process.env.NODE_ENV !== "production";
-const hostname = "localhost";
-const port = 3001;
+const hostname = process.env.HOST || "localhost";
+const port = Number(process.env.PORT) || 3000;
 
 const app = next({ dev, hostname, port });
 const handler = app.getRequestHandler();
@@ -29,83 +30,112 @@ app.prepare().then(() => {
     socket.on(
       "task-drag",
       async (payload: {
-        id: string;
-        newColumn: number;
-        newOrder: number;
+        source: DraggableLocation;
+        destination: DraggableLocation;
         email: string;
       }) => {
-        console.log("This is the payload we received:", payload);
+        const { source, destination, email } = payload;
 
-        const { id: taskId, newColumn, newOrder, email } = payload;
-        const dbUser = await db.user.findUnique({
-          where: {
-            email,
-          },
-        });
-
-        if (!dbUser) return;
-
-        const tasks = await db.task.findMany({
-          where: {
-            userId: dbUser.id,
-          },
-        });
-
-        console.log(tasks);
-
-        const updatedTasks = await updateTaskInDB(
-          tasks,
-          taskId,
-          newColumn,
-          newOrder,
-        );
-
-        console.log("this is the updated tasks", updatedTasks);
-
-        io.sockets.emit("tasks-updated", updatedTasks);
+        try {
+          const updatedTasks = await handleTaskDrag(email, source, destination);
+          if (updatedTasks) {
+            io.sockets.emit("tasks-updated", updatedTasks);
+          }
+        } catch (error) {
+          console.error(
+            "ERROR: failed to update or fetch the user tasks",
+            error,
+          );
+        }
       },
     );
 
     socket.on("disconnect", () => {
-      socket.disconnect();
       console.log(`'${socket.id}' user just disconnected! 👀`);
     });
   });
 
   httpServer
     .once("error", (err) => {
-      console.error(err);
+      console.error("ERROR: server failure", err);
       process.exit(1);
     })
 
     .listen(port, () => {
-      console.log(`> Ready on http://${hostname}:${port}`);
+      console.log(`Listening on 'http://${hostname}:${port}'`);
     });
 });
 
-async function updateTaskInDB(
-  tasks: TTask[],
-  taskId: string,
-  newColumn: number,
-  newOrder: number,
+async function handleTaskDrag(
+  email: string,
+  source: DraggableLocation,
+  destination: DraggableLocation,
 ) {
-  const taskToMove = tasks.find((task) => task.id === taskId);
-  if (!taskToMove) return;
+  const dbUser = await db.user.findUnique({ where: { email } });
+  if (!dbUser) return;
 
-  await db.task.update({
-    where: { id: taskId },
-    data: {
-      column: newColumn,
-      order: newOrder,
-    },
+  const tasks = await db.task.findMany({ where: { userId: dbUser.id } });
+  return updateTasksInDB(tasks, source, destination);
+}
+
+async function updateTasksInDB(
+  tasks: TTask[],
+  source: DraggableLocation,
+  destination: DraggableLocation,
+) {
+  const { droppableId: sourceColumn, index: sourceOrder } = source;
+  const { droppableId: destinationColumn, index: destinationOrder } =
+    destination;
+
+  const taskMoved = tasks.find(
+    (task) =>
+      task.column === Number(sourceColumn) && task.order === sourceOrder,
+  );
+
+  if (!taskMoved) return;
+
+  // Filter the moved task from the tasks array.
+  tasks = tasks.filter((task) => task.id !== taskMoved.id);
+
+  taskMoved.column = Number(destinationColumn);
+  taskMoved.order = destinationOrder;
+
+  const columns: { [key: number]: TTask[] } = {
+    0: tasks.filter((task) => task.column === 0),
+    1: tasks.filter((task) => task.column === 1),
+    2: tasks.filter((task) => task.column === 2),
+  };
+
+  columns[taskMoved.column].splice(destinationOrder, 0, taskMoved);
+
+  // Reorder each column to have sequential order values
+  Object.values(columns).forEach((columnTasks) => {
+    columnTasks.forEach((task, index) => {
+      task.order = index;
+    });
   });
 
-  const sortedTasks = await db.task.findMany({
-    where: {
-      userId: taskToMove.userId,
-    },
-    orderBy: [{ column: "asc" }, { order: "asc" }],
-  });
+  tasks = [...columns[0], ...columns[1], ...columns[2]];
 
-  return sortedTasks;
+  // Sort tasks by column and order before returning
+  tasks.sort((a, b) =>
+    a.column === b.column ? a.order - b.order : a.column - b.column,
+  );
+
+  const updateTasksPromises = tasks.map((task) =>
+    db.task.update({
+      where: {
+        id: task.id,
+      },
+      data: {
+        column: task.column,
+        order: task.order,
+      },
+    }),
+  );
+
+  // Execute all updates in parallel
+  await Promise.all(updateTasksPromises);
+
+  return tasks;
 }

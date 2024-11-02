@@ -9,7 +9,7 @@ const LANGUAGE_COOKIE = "NEXT_LOCALE";
 export async function setLanguage(locale: string) {
   const cookieStore = cookies();
   cookieStore.set(LANGUAGE_COOKIE, locale, {
-    // one year in milisecods
+    // One year
     maxAge: 1000 * 60 * 60 * 24 * 365,
   });
 }

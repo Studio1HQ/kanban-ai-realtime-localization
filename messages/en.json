@@ -17,6 +17,7 @@
   "completed": "Completed",
   "pending": "Pending",
   "created-on": "Created on",
+  "min-length-8": "Min length 8",
   "view-description": "View description",
   "something-went-wrong": "Uh oh, something went wrong",
   "failed-to-create-task": "Failed to create task",

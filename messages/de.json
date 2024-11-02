@@ -17,6 +17,7 @@
   "completed": "Abgeschlossen",
   "pending": "Ausstehend",
   "created-on": "Erstellt am",
+  "min-length-8": "Min. 8 Zeichen",
   "view-description": "Beschreibung anzeigen",
   "something-went-wrong": "Oh oh, etwas ist schiefgelaufen",
   "failed-to-create-task": "Aufgabe konnte nicht erstellt werden",

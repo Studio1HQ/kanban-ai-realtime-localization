@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(userWithBoardsAndTasks);
   } catch (error) {
-    console.error(error);
+    console.error("ERROR:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },

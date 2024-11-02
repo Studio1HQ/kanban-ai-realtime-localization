@@ -16,11 +16,10 @@ export async function POST(req: NextRequest) {
     }
 
     const { email, password } = validatedFields.data;
-    console.log("this is the user data", email, password);
 
     return NextResponse.json({ email, password });
   } catch (error) {
-    console.log(error);
+    console.error("ERROR:", error);
     return NextResponse.json(
       { error: "Something went wrong" },
       { status: 500 },

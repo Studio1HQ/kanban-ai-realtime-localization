@@ -14,7 +14,6 @@ import { Session } from "next-auth";
 import { Task as TTask } from "@prisma/client";
 import { Task } from "@/components/task";
 import { T } from "@tolgee/react";
-import { useQuery } from "@tanstack/react-query";
 
 export const Board = ({ userId }: { userId: string }) => {
   const socket = useSocket();
@@ -24,56 +23,56 @@ export const Board = ({ userId }: { userId: string }) => {
 
   useEffect(() => {
     const fetchSession = async () => {
-      const sessionData = await getSession();
-      setSession(sessionData);
+      try {
+        const sessionData = await getSession();
+        setSession(sessionData);
+      } catch (error) {
+        console.error("ERROR: failed to fetch the session", error);
+      }
     };
     fetchSession();
   }, []);
 
   useEffect(() => {
-    console.log("socket changed");
-    socket?.on("tasks-updated", (data: TTask[] | undefined) => {
-      console.log("socket data", data);
-      if (!data) return;
-      setTasks(data);
-    });
+    if (!session) return;
 
-    return () => {
-      socket?.off("tasks-updated");
+    const fetchUserTasks = async () => {
+      try {
+        const userEmail = session.user?.email || "";
+        const { data } = (await axios.get("/api/tasks", {
+          params: { userId, email: userEmail },
+        })) as { data: { tasks: TTask[] } };
+
+        setTasks(data.tasks);
+      } catch (error) {
+        console.error("ERROR:", error);
+      }
     };
-  }, [socket]);
+    fetchUserTasks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session]);
 
   useEffect(() => {
-    console.log("socket changed in the task-created");
-    socket?.on("task-created", (newTask: TTask) => {
-      console.log("socket data", newTask);
+    const handleTasksUpdated = (data: TTask[] | undefined) => {
+      if (!data) return;
+      setTasks(data);
+    };
+
+    const handleTaskCreated = (newTask: TTask) => {
       setTasks((prevTasks) => [...(prevTasks || []), newTask]);
-    });
+    };
+
+    socket?.on("tasks-updated", handleTasksUpdated);
+    socket?.on("task-created", handleTaskCreated);
 
     return () => {
-      socket?.off("task-created");
+      socket?.off("tasks-updated", handleTasksUpdated);
+      socket?.off("task-created", handleTaskCreated);
     };
   }, [socket]);
 
-  const fetchUserData = async (userId: string, userEmail: string) => {
-    const { data } = (await axios.get("/api/tasks", {
-      params: { userId, email: userEmail },
-    })) as { data: { tasks: TTask[] } };
-    return data.tasks;
-  };
-
-  useQuery({
-    queryKey: ["userTasks"],
-    queryFn: async () => {
-      const userTasks = await fetchUserData(userId, session?.user?.email || "");
-      setTasks(userTasks);
-      return userTasks;
-    },
-    enabled: !!session,
-  });
-
   const tasksByStatus = (status: number) =>
-    tasks?.filter((task) => task.column === status) || [];
+    tasks?.filter((task) => task.column === status);
 
   const columns = {
     0: "Ongoing",
@@ -89,27 +88,11 @@ export const Board = ({ userId }: { userId: string }) => {
     )
       return;
 
-    const newTasks = tasks ? [...tasks] : [];
-    const [movedTask] = newTasks.splice(source.index, 1);
-
-    movedTask.column = Number(destination.droppableId);
-    movedTask.order = Number(destination.index);
-
-    // Insert the moved task at the new index
-    newTasks.splice(destination.index, 0, movedTask);
-
-    setTasks(newTasks);
-
-    console.log("this is the moved task", movedTask);
-
     socket?.emit("task-drag", {
-      id: movedTask.id,
-      newColumn: movedTask.column,
-      newOrder: movedTask.order,
+      source,
+      destination,
       email: session?.user?.email || "",
     });
-
-    console.log(destination, source);
   };
 
   if (!tasks || tasks.length === 0) return null;
@@ -117,7 +100,7 @@ export const Board = ({ userId }: { userId: string }) => {
   return (
     <div className="container mx-auto mt-10 mb-5">
       <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {Object.entries(columns).map(([status, title]) => (
             <div
               key={status}
@@ -133,7 +116,7 @@ export const Board = ({ userId }: { userId: string }) => {
                     ref={provided.innerRef}
                     className="w-full flex flex-col items-center min-h-40"
                   >
-                    {tasksByStatus(Number(status)).map((task, index) => (
+                    {tasksByStatus(Number(status))?.map((task, index) => (
                       <Draggable
                         key={task.id}
                         draggableId={task.id}

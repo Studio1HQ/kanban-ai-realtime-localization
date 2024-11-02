@@ -23,7 +23,7 @@ export const Task = ({ task }: { task: TTask }) => {
         <CardContent>
           <Link
             href={`/kanban/${task.id}`}
-            className="text-gray-800 text-semibold underline hover:text-gray-900 underline-offset-2"
+            className="text-gray-800 font-semibold underline hover:text-gray-900 underline-offset-2"
           >
             <T keyName="view-description" />
           </Link>
