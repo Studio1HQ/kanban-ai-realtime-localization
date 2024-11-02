@@ -9,6 +9,8 @@ import Link from "next/link";
 import { T, useTranslate } from "@tolgee/react";
 import { LoaderCircle } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import axios from "axios";
+import { useMutation } from "@tanstack/react-query";
 
 export const Register = () => {
   const router = useRouter();
@@ -18,38 +20,32 @@ export const Register = () => {
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (response.ok) {
-        router.push("/login");
-        router.refresh();
-      } else {
-        toast({
-          title: t("something-went-wrong"),
-          description: t("there-was-a-problem-registering-your-account"),
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
+  const { mutate: register, isPending } = useMutation({
+    mutationFn: async () => {
+      const payload = {
+        email,
+        password,
+      };
+      await axios.post("/api/auth/register", payload);
+    },
+    onSuccess: () => {
+      router.push("/login");
+      router.refresh();
+    },
+    onError: (error) => {
       console.error("ERROR:", error);
       toast({
         title: t("something-went-wrong"),
+        description: t("there-was-a-problem-registering-your-account"),
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
-    }
+    },
+  });
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    register();
   }
 
   return (
@@ -99,9 +95,9 @@ export const Register = () => {
           <Button
             type="submit"
             className="w-full bg-gray-600 text-white p-3 rounded hover:bg-gray-600 transition duration-200"
-            disabled={isLoading}
+            disabled={isPending}
           >
-            {isLoading && (
+            {isPending && (
               <LoaderCircle className="w-5 h-5 text-gray-300 animate-spin mr-2" />
             )}
             <T keyName="register" />

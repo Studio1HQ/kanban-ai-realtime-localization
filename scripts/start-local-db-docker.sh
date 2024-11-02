@@ -21,7 +21,7 @@ fi
 
 # import env variables from .env
 set -a
-source .env
+source ../.env
 
 # Extract components from DATABASE_URL
 PROTO="$(echo $DATABASE_URL | grep :// | sed -e's,^\(.*://\).*,\1,g')"
@@ -45,7 +45,7 @@ if [ "$DB_PASSWORD" = "password" ]; then
   if [[ $REPLY =~ ^[Yy]$ ]]; then
     # Generate a random URL-safe password
     DB_PASSWORD=$(openssl rand -base64 12 | tr '+/' '-_')
-    sed -i -e "s#:password@#:$DB_PASSWORD@#" .env
+    sed -i -e "s#:password@#:$DB_PASSWORD@#" ../.env
   else
     echo "Please set a password in the `.env` file and try again"
     exit 1
