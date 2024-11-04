@@ -4,6 +4,7 @@
   "register": "Registrovat se",
   "password": "Heslo",
   "email": "Email",
+  "back": "Zpřed",
   "language": "Jazyk",
   "select-a-language": "Vyberte jazyk",
   "dont-have-an-account": "Nemáte účet?",
@@ -20,6 +21,7 @@
   "min-length-8": "Min. 8 znaků",
   "view-description": "Zobrazit popis",
   "something-went-wrong": "Uh oh, něco se pokazilo",
+  "no-description-provided-for-this-task": "Nebyl zadan popis pro tuto učení",
   "failed-to-create-task": "Nepodařilo se vytvořit úkol",
   "there-was-a-problem-registering-your-account": "Při registraci vašeho účtu došlo k problému"
 }

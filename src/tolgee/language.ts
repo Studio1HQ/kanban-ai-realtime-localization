@@ -2,7 +2,7 @@
 
 import { detectLanguageFromHeaders } from "@tolgee/react/server";
 import { cookies, headers } from "next/headers";
-import { ALL_LANGUAGES, DEFAULT_LANGUAGE } from "./shared";
+import { ALL_LANGUAGES, DEFAULT_LANGUAGE } from "@/tolgee/shared";
 
 const LANGUAGE_COOKIE = "NEXT_LOCALE";
 

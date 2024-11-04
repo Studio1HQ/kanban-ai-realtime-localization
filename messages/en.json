@@ -5,6 +5,7 @@
   "password": "Password",
   "email": "Email",
   "language": "Language",
+  "back": "Back",
   "select-a-language": "Select a language",
   "dont-have-an-account": "Don't have an account?",
   "already-have-an-account": "Already have an account?",
@@ -20,6 +21,7 @@
   "min-length-8": "Min length 8",
   "view-description": "View description",
   "something-went-wrong": "Uh oh, something went wrong",
+  "no-description-provided-for-this-task": "No description provided for this task",
   "failed-to-create-task": "Failed to create task",
   "there-was-a-problem-registering-your-account": "There was a problem registering your account"
 }

@@ -4,6 +4,7 @@
   "register": "Registrieren",
   "password": "Passwort",
   "email": "E-Mail",
+  "back": "Zurück",
   "language": "Sprache",
   "select-a-language": "Sprache auswählen",
   "dont-have-an-account": "Kein Konto?",
@@ -20,6 +21,7 @@
   "min-length-8": "Min. 8 Zeichen",
   "view-description": "Beschreibung anzeigen",
   "something-went-wrong": "Oh oh, etwas ist schiefgelaufen",
+  "no-description-provided-for-this-task": "Keine Beschreibung angegeben für diese Aufgabe",
   "failed-to-create-task": "Aufgabe konnte nicht erstellt werden",
   "there-was-a-problem-registering-your-account": "Es gab ein Problem bei der Registrierung Ihres Kontos"
 }

@@ -13,7 +13,7 @@ type Props = {
 
 const tolgee = TolgeeBase().init();
 
-export const TolgeeNextProvider = ({
+export const TolgeeProviderClient = ({
   language,
   staticData,
   children,

@@ -13,10 +13,14 @@ import axios from "axios";
 import { Session } from "next-auth";
 import { Task as TTask } from "@prisma/client";
 import { Task } from "@/components/task";
-import { T } from "@tolgee/react";
+import { T, useTranslate } from "@tolgee/react";
+import { useToast } from "@/hooks/use-toast";
 
 export const Board = ({ userId }: { userId: string }) => {
   const socket = useSocket();
+  const { toast } = useToast();
+
+  const { t } = useTranslate();
 
   const [tasks, setTasks] = useState<TTask[] | null>([]);
   const [session, setSession] = useState<Session | null>(null);
@@ -27,10 +31,15 @@ export const Board = ({ userId }: { userId: string }) => {
         const sessionData = await getSession();
         setSession(sessionData);
       } catch (error) {
-        console.error("ERROR: failed to fetch the session", error);
+        console.error("ERROR:", error);
+        toast({
+          title: t("something-went-wrong"),
+          variant: "destructive",
+        });
       }
     };
     fetchSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

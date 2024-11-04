@@ -1,4 +1,6 @@
 // NOTE: Always Keep this 'tsconfig-paths' import at the top.
+// It allows us to use custom paths and aliases defined in the
+// `tsconfig.json` file like '@/db'
 import "tsconfig-paths/register";
 
 import { createServer } from "node:http";

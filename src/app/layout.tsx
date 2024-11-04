@@ -6,7 +6,7 @@ import { Navbar } from "@/components/navbar";
 import Providers from "@/providers/providers";
 import { getLanguage } from "@/tolgee/language";
 import { getStaticData } from "@/tolgee/shared";
-import { TolgeeNextProvider } from "@/tolgee/client";
+import { TolgeeProviderClient } from "@/tolgee/client";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -40,11 +40,11 @@ export default async function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <TolgeeNextProvider language={locale} staticData={staticData}>
+          <TolgeeProviderClient language={locale} staticData={staticData}>
             <Navbar />
             {children}
             <Toaster />
-          </TolgeeNextProvider>
+          </TolgeeProviderClient>
         </body>
       </Providers>
     </html>

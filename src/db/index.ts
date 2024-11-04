@@ -1,13 +1,12 @@
-/* eslint-disable no-var */
 import { PrismaClient } from "@prisma/client";
 
 const prismaClientSingleton = () => {
   return new PrismaClient();
 };
 
-declare global {
-  var prismaGlobal: undefined | ReturnType<typeof prismaClientSingleton>;
-}
+declare const globalThis: {
+  prismaGlobal: ReturnType<typeof prismaClientSingleton>;
+} & typeof global;
 
 export const db = globalThis.prismaGlobal ?? prismaClientSingleton();
 

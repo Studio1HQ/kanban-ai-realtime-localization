@@ -1,8 +1,8 @@
 import { FormatIcu } from "@tolgee/format-icu";
 import { DevTools, Tolgee } from "@tolgee/web";
 
-const apiKey = process.env.NEXT_PUBLIC_TOLGEE_API_KEY;
-const apiUrl = process.env.NEXT_PUBLIC_TOLGEE_API_URL;
+const apiKey = process.env.TOLGEE_API_KEY;
+const apiUrl = process.env.TOLGEE_API_URL;
 
 export const ALL_LANGUAGES = ["en", "cs", "de", "fr"];
 

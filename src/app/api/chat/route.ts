@@ -23,9 +23,9 @@ export async function POST(req: NextRequest) {
 
     const { messages } = validatedFields.data;
 
-    const lastUserMessage = [...messages]
-      .reverse()
-      .find((message) => message.role === "user")?.content;
+    const lastUserMessage = messages.findLast(
+      (message) => message.role === "user",
+    )?.content;
 
     if (!lastUserMessage) {
       return NextResponse.json(
